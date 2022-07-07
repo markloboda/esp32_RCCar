@@ -2,10 +2,10 @@
 #include <string>
 #include "WiFi.h"
 #include "ESPAsyncWebServer.h"
-#include "global.h"
+#include "secrets.h"
 
-const char* ssid = "";  //replace
-const char* password =  ""; //replace
+const char* ssid = secret_ssid;  //replace
+const char* password =  secret_password; //replace
 
 AsyncWebServer server(80);
 
