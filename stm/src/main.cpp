@@ -22,9 +22,9 @@ int enable1Pin = 14;
 const int freq = 30000;
 const int dcPwmChannel = 1;
 const int resolution = 8;
-int dutyCycle = 200;
+int dutyCycle = 0;
 
-////////////////////
+//////////////////// 
 // Servo motor properties
 ////////////////////
 int servoPin = 18;
