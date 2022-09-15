@@ -1,12 +1,9 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <AsyncJson.h>
-#include <ESP32Servo.h>
 #include "WiFi.h"
 #include "ESPAsyncWebServer.h"
 #include "secrets.h"
-
-#include "esp32-hal-ledc.h"
 
 // wifi connection
 const char *ssid = secret_ssid;         // replace
@@ -30,7 +27,6 @@ int dutyCycle = 200;
 ////////////////////
 // Servo motor properties
 ////////////////////
-Servo steeringServo;
 int servoPin = 18;
 int servoPwmChannel = 2;
 int minServoVal = 1638;
