@@ -17,7 +17,7 @@ class MainActivity : Activity() {
     private lateinit var seekThrottle: SeekBar
     private lateinit var seekSteering: SeekBar
 
-    private val homeURL = "http://192.168.137.34"
+    private val homeURL = "http://192.168.64.107"
     private lateinit var queue: RequestQueue
 
 
@@ -49,11 +49,11 @@ class MainActivity : Activity() {
                 seekThrottle.progress = 105
             }
         })
-        seekSteering.max = 200
-        seekSteering.progress = 100
+        seekSteering.max = 80
+        seekSteering.progress = 40
         seekSteering.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val steering = progress      // turning is a value between 0 and 180
+                val steering = seekSteering.max - progress      // turning is a value between 0 and 180
                 sendHttpRequest("steering", steering)
             }
 

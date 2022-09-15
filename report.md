@@ -93,7 +93,7 @@ We now need to setup the properties to the correct values for the DC motor to wo
 
 ### "What is a DC motor and how do we control it?"
 
-A **DC motor** or a **Direct Current motor** is an electrical machine that converts electrical energy into mechanical energy. To achieve that,it uses a magnetic field, which then attracts and repels magnets on the rotor. Weather the rotor is attracted or repelled depends on the polarity of the current. The polarity of the current is controlled by the input pins of the L298N motor driver.
+A **DC motor** or a **Direct Current motor** is an electrical machine that converts electrical energy into mechanical energy. To achieve that it uses a magnetic field, which then attracts and repels opposite magnets on the rotor. Weather the rotor is attracted or repelled depends on the polarity of the current.
 
 Image of a DC motor:
 <img src="./imgs/dc-motor.gif">
