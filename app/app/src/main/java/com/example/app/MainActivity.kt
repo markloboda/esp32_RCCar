@@ -17,7 +17,7 @@ class MainActivity : Activity() {
     private lateinit var seekThrottle: SeekBar
     private lateinit var seekSteering: SeekBar
 
-    private val homeURL = "http://192.168.64.107"
+    private val homeURL = "http://192.168.137.34"
     private lateinit var queue: RequestQueue
 
 
@@ -33,11 +33,11 @@ class MainActivity : Activity() {
         seekThrottle = findViewById(R.id.seekThrottle)
         seekSteering = findViewById(R.id.seekSteering)
 
-        seekThrottle.max = 200
-        seekThrottle.progress = 100
+        seekThrottle.max = 210
+        seekThrottle.progress = 105
         seekThrottle.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val throttle = progress - 100       // throttle is a value between -100 and 100
+                val throttle = progress - 105       // throttle is a value between -100 and 100
                 sendHttpRequest("throttle", throttle)
             }
 
@@ -46,14 +46,14 @@ class MainActivity : Activity() {
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 // reset the seekbar to 100 if the user stops touching it
-                seekThrottle.progress = 100
+                seekThrottle.progress = 105
             }
         })
         seekSteering.max = 200
         seekSteering.progress = 100
         seekSteering.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val steering = progress - 100       // turning is a value between -100 and 100
+                val steering = progress      // turning is a value between 0 and 180
                 sendHttpRequest("steering", steering)
             }
 
@@ -62,12 +62,12 @@ class MainActivity : Activity() {
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 // reset the seekbar to 100 if the user stops touching it
-                seekSteering.progress = 100
+                seekSteering.progress = 90
             }
         })
 
-        seekSteering.max = 200
-        seekSteering.progress = 100
+        seekSteering.max = 180
+        seekSteering.progress = 90
 
     }
 
