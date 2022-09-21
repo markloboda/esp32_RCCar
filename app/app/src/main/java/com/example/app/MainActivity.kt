@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import android.view.Window
+import android.widget.EditText
 import android.widget.SeekBar
 import com.android.volley.Request
 import com.android.volley.RequestQueue
@@ -16,8 +17,9 @@ class MainActivity : Activity() {
 
     private lateinit var seekThrottle: SeekBar
     private lateinit var seekSteering: SeekBar
+    private lateinit var editTextEspIp: EditText
 
-    private val homeURL = "http://192.168.64.107"
+    private var homeURL = "http://"
     private lateinit var queue: RequestQueue
 
 
@@ -32,6 +34,13 @@ class MainActivity : Activity() {
         super.onPostCreate(savedInstanceState)
         seekThrottle = findViewById(R.id.seekThrottle)
         seekSteering = findViewById(R.id.seekSteering)
+        editTextEspIp = findViewById(R.id.editTextEspIp)
+
+        editTextEspIp.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                this.homeURL = "http://" + editTextEspIp.text.toString()
+            }
+        }
 
         seekThrottle.max = 210
         seekThrottle.progress = 105
