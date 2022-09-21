@@ -24,7 +24,7 @@ const int dcPwmChannel = 1;
 const int resolution = 8;
 int dutyCycle = 0;
 
-//////////////////// 
+////////////////////
 // Servo motor properties
 ////////////////////
 int servoPin = 18;
@@ -137,6 +137,7 @@ void setup()
 
   // wifi connection
   WiFi.begin(ssid, password);
+  // change the variables ssid and password to your wifi credentials
 
   // wait for connection
   while (WiFi.status() != WL_CONNECTED)
