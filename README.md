@@ -2,7 +2,7 @@
 
 This is a project where we build a car that can be controlled by a smartphone via WIFI. The project can be extended to work over the internet, but for now we will just use the local network.
 
-# IMAGE OF THE CAR... maybe a gif #
+<img src="./imgs/car.jpg">
 
 ## 1. Parts used in the project
 * Prebuilt toy radio controlled car
@@ -263,9 +263,23 @@ When we have the correct duty cycle value, we can set the pwm channel for steeri
 ledcWrite(servoPwmChannel, steeringPwmCount);
 ```
 
+Last thing we need to do is somehow connect the servo to the wheels. I did it with a simple wire.
+
+
+
 ## 5. Controlling the car with a web server
 
 For a web server we are going to use an arduino library called [***ESPAsyncWebServer***](https://github.com/me-no-dev/ESPAsyncWebServer). The library is used to create a web server on the ESP32. The web server is hosted on the ESP32 and will be accessible through the local IP address of the ESP32. The web server will have a simple interface, where we can control the speed and the steering of the car.
+
+First we setup properties for the web server.
+
+```cpp
+// wifi connection
+const char *ssid = secret_ssid;         // replace
+const char *password = secret_password; // replace
+
+AsyncWebServer server(80);
+```
 
 First we need to connect the ESP32 to the WiFi network. For this we need to set the SSID and the password of the WiFi network.
 
@@ -356,161 +370,66 @@ Now everything regarding the ESP32 is setup. All we need to do is setup an app t
 
 This tutorial will not go into detail about the app itself, but will explain the important parts of the app. You can choose which ever method you prefer, but in this tutorial we are going to be using an Android app written in Kotlin programming language.
 
+### 6.1. Setting up the layout of the app
+
 We need to make a layout first. The layout will have two seekbars, one for the throttle and one for the steering. It will also include a text field for the local ip of the ESP32 and a Confirm button. I used the Android Studio to create the layout. You can use any method.
 
 The layout is defined in the file [**activity_main.xml**](https://github.com/markloboda/esp32_RCCar/blob/main/app/app/src/main/res/layout/activity_main.xml). The layout is defined as:
 
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <SeekBar
-        android:id="@+id/seekThrottle"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:padding="100dp"
-        android:rotation="270"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <SeekBar
-        android:id="@+id/seekSteering"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:padding="100dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
-        android:id="@+id/editTextEspIp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="IP address for ESP32 [192.168.64.107]"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/confirmIpBtn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/confirmIpBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Confirm"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
-```
-
 Now we need to program the app. The app is programmed in Kotlin.
 
-All we need to do is setup the listeners on the seekbars, to send the data to the ESP32.
+### 6.2. Setting up the code for the app
+
+All we need to do is setup the listeners on the seekbars, to send the data to the ESP32. We do that with the following code:
+
+```cpp
+seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+  override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+  }
+
+  override fun onStartTrackingTouch(seekBar: SeekBar?) {
+  }
+
+  override fun onStopTrackingTouch(seekBar: SeekBar?) {
+  }
+})
+```
+
+Each of these three functions is called when something happens to the seekbar. We are only instrested in the **onProgressChanged** and **onStopTrackingTouch** functions. The **onProgressChanged** function is called when the seekbar is moved. The **onStopTrackingTouch** function is called when the user stops moving the seekbar. We need to send a request each time the user moves the seekbar. The code for the **onProgressChanged** function is:
+
+```cpp
+override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+  val throttle = progress - 105       // throttle is a value between -100 and 100
+  sendHttpRequest("throttle", throttle)
+}
+```
+
+Basically we check the progress and offset it by -105. This way we get negative numbers if the seekbar is on the bottom half of the seekbar and positive numbers if the seekbar is on the top half of the seekbar. Then we call the function **sendHttpRequest()** with the command and the value. The function **sendHttpRequest()** is defined as:
+
+```cpp
+private fun sendHttpRequest(command: String, value: Int) {
+  val url = "$homeURL/controls/$command"
+
+  val params = HashMap<Any?, Any?>()
+  params["value"] = value
+  val jsonObject = JSONObject(params)
+
+  val request = JsonObjectRequest(Request.Method.POST, url, jsonObject,
+    { response ->
+      Log.d("MainActivity", "Response: $response")
+    },
+    { error ->
+      Log.d("MainActivity", "Error: $error")
+    }
+  )
+  queue.add(request)
+  }
+```
+
+We do the same for steering, but we choose the command "steering" and value of steering.
 
 The code is defined in the file [***MainActivity.kt***](https://github.com/markloboda/esp32_RCCar/blob/main/app/app/src/main/java/com/example/app/MainActivity.kt). The code is defined as:
 
-```kotlin
-package com.example.app
-
-import android.app.Activity
-import android.os.Bundle
-import android.util.Log
-import android.view.Window
-import android.widget.SeekBar
-import com.android.volley.Request
-import com.android.volley.RequestQueue
-import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.Volley
-import org.json.JSONObject
-
-class MainActivity : Activity() {
-
-
-    private lateinit var seekThrottle: SeekBar
-    private lateinit var seekSteering: SeekBar
-
-    private val homeURL = "http://192.168.64.107"
-    private lateinit var queue: RequestQueue
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        queue = Volley.newRequestQueue(this)
-        setContentView(R.layout.activity_main)
-    }
-
-    override fun onPostCreate(savedInstanceState: Bundle?) {
-        super.onPostCreate(savedInstanceState)
-        seekThrottle = findViewById(R.id.seekThrottle)
-        seekSteering = findViewById(R.id.seekSteering)
-
-        seekThrottle.max = 210
-        seekThrottle.progress = 105
-        seekThrottle.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val throttle = progress - 105       // throttle is a value between -100 and 100
-                sendHttpRequest("throttle", throttle)
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                // reset the seekbar to 100 if the user stops touching it
-                seekThrottle.progress = 105
-            }
-        })
-        seekSteering.max = 80
-        seekSteering.progress = 40
-        seekSteering.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val steering = seekSteering.max - progress      // turning is a value between 0 and 180
-                sendHttpRequest("steering", steering)
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                // reset the seekbar to 100 if the user stops touching it
-                seekSteering.progress = 90
-            }
-        })
-
-        seekSteering.max = 180
-        seekSteering.progress = 90
-
-    }
-
-    private fun sendHttpRequest(command: String, value: Int) {
-        val url = "$homeURL/controls/$command"
-
-        val params = HashMap<Any?, Any?>()
-        params["value"] = value
-        val jsonObject = JSONObject(params)
-
-        val request = JsonObjectRequest(Request.Method.POST, url, jsonObject,
-            { response ->
-                Log.d("MainActivity", "Response: $response")
-            },
-            { error ->
-                Log.d("MainActivity", "Error: $error")
-            }
-        )
-        queue.add(request)
-    }
-}
-```
 
 ## 7. Combined code
 
