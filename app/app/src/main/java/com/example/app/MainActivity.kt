@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import android.view.Window
+import android.widget.Button
 import android.widget.EditText
 import android.widget.SeekBar
 import com.android.volley.Request
@@ -18,6 +19,7 @@ class MainActivity : Activity() {
     private lateinit var seekThrottle: SeekBar
     private lateinit var seekSteering: SeekBar
     private lateinit var editTextEspIp: EditText
+    private lateinit var confirmIpBtn: Button
 
     private var homeURL = "http://"
     private lateinit var queue: RequestQueue
@@ -35,11 +37,10 @@ class MainActivity : Activity() {
         seekThrottle = findViewById(R.id.seekThrottle)
         seekSteering = findViewById(R.id.seekSteering)
         editTextEspIp = findViewById(R.id.editTextEspIp)
+        confirmIpBtn = findViewById(R.id.confirmIpBtn)
 
-        editTextEspIp.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {
-                this.homeURL = "http://" + editTextEspIp.text.toString()
-            }
+        confirmIpBtn.setOnClickListener {
+            this.homeURL = "http://" + editTextEspIp.text.toString()
         }
 
         seekThrottle.max = 210
