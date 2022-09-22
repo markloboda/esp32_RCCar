@@ -356,7 +356,9 @@ Now everything regarding the ESP32 is setup. All we need to do is setup an app t
 
 This tutorial will not go into detail about the app itself, but will explain the important parts of the app. You can choose which ever method you prefer, but in this tutorial we are going to be using an Android app written in Kotlin programming language.
 
-We need to make a layout first. The layout will have two seekbars, one for the throttle and one for the steering. The layout is defined in the file [**activity_main.xml**](https://github.com/markloboda/esp32_RCCar/blob/main/app/app/src/main/res/layout/activity_main.xml). The layout is defined as:
+We need to make a layout first. The layout will have two seekbars, one for the throttle and one for the steering. It will also include a text field for the local ip of the ESP32 and a Confirm button. I used the Android Studio to create the layout. You can use any method.
+
+The layout is defined in the file [**activity_main.xml**](https://github.com/markloboda/esp32_RCCar/blob/main/app/app/src/main/res/layout/activity_main.xml). The layout is defined as:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -386,12 +388,35 @@ We need to make a layout first. The layout will have two seekbars, one for the t
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/editTextEspIp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="IP address for ESP32 [192.168.64.107]"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toTopOf="@+id/confirmIpBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/confirmIpBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Confirm"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
 
-I used the Android Studio to create the layout. You can use any method.
+Now we need to program the app. The app is programmed in Kotlin.
 
-Now we need to program the app. The app is programmed in Kotlin. The code is defined in the file [***MainActivity.kt***](https://github.com/markloboda/esp32_RCCar/blob/main/app/app/src/main/java/com/example/app/MainActivity.kt). The code is defined as:
+All we need to do is setup the listeners on the seekbars, to send the data to the ESP32.
+
+The code is defined in the file [***MainActivity.kt***](https://github.com/markloboda/esp32_RCCar/blob/main/app/app/src/main/java/com/example/app/MainActivity.kt). The code is defined as:
 
 ```kotlin
 package com.example.app
